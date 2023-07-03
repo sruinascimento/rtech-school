@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -24,10 +25,9 @@ class CourseController {
     @GetMapping("/courses")
     ResponseEntity<List<CourseResponse>> allCourses() {
         List<Course> courses = courseRepository.findAll();
-        List<CourseResponse> courseResponses = new ArrayList<>();
-        for (Course course : courses) {
-            courseResponses.add(new CourseResponse(course));
-        }
+        List<CourseResponse> courseResponses = courses.stream()
+                .map(CourseResponse::new)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(courseResponses);
     }
 

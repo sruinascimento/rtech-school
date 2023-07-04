@@ -8,7 +8,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table
-class Course {
+public class Course {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -39,7 +39,7 @@ class Course {
         return code;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 

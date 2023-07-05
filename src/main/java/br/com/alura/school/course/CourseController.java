@@ -1,12 +1,15 @@
 package br.com.alura.school.course;
 
-import br.com.alura.school.lesson.Lesson;
-import br.com.alura.school.lesson.LessonRepository;
-import br.com.alura.school.lesson.LessonResponse;
-import br.com.alura.school.lesson.NewLessonRequest;
+import br.com.alura.school.section.Section;
+import br.com.alura.school.section.SectionRepository;
+import br.com.alura.school.section.NewSectionResponse;
+import br.com.alura.school.section.NewSectionRequest;
 import br.com.alura.school.user.User;
 import br.com.alura.school.user.UserRepository;
-import br.com.alura.school.user.UserRole;
+import br.com.alura.school.video.NewVideoRequest;
+import br.com.alura.school.video.NewVideoResponse;
+import br.com.alura.school.video.Video;
+import br.com.alura.school.video.VideoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -27,20 +30,22 @@ class CourseController {
 
     private final CourseRepository courseRepository;
 
-    private final LessonRepository lessonRepository;
+    private final SectionRepository sectionRepository;
 
     private final UserRepository userRepository;
 
-    public CourseController(CourseRepository courseRepository, LessonRepository lessonRepository, UserRepository userRepository) {
+    private final VideoRepository videoRepository;
+
+    public CourseController(CourseRepository courseRepository, SectionRepository sectionRepository, UserRepository userRepository, VideoRepository videoRepository) {
         this.courseRepository = courseRepository;
-        this.lessonRepository = lessonRepository;
+        this.sectionRepository = sectionRepository;
         this.userRepository = userRepository;
+        this.videoRepository = videoRepository;
     }
 
     @GetMapping("/courses")
     ResponseEntity<List<CourseResponse>> allCourses() {
-        List<Course> courses = courseRepository.findAll();
-        List<CourseResponse> courseResponses = courses.stream()
+        List<CourseResponse> courseResponses = courseRepository.findAll().stream()
                 .map(CourseResponse::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(courseResponses);
@@ -61,7 +66,7 @@ class CourseController {
 
     @PostMapping("/courses/{code}/sections")
     ResponseEntity<?> newLesson(@PathVariable("code") String code,
-                                @RequestBody @Valid NewLessonRequest newLessonRequest,
+                                @RequestBody @Valid NewSectionRequest newSectionRequest,
                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(getErrorMessageValidation(bindingResult));
@@ -73,7 +78,7 @@ class CourseController {
             return ResponseEntity.badRequest().body("Curso não encontrado");
         }
 
-        Optional<User> optionalAuthor = userRepository.findByUsername(newLessonRequest.getAuthorUsername());
+        Optional<User> optionalAuthor = userRepository.findByUsername(newSectionRequest.getAuthorUsername());
 
         if (optionalAuthor.isEmpty()) {
             return ResponseEntity.badRequest().body("Autor não encontrado");
@@ -83,17 +88,51 @@ class CourseController {
             return ResponseEntity.badRequest().body("Autor não é instrutor");
         }
 
-        Lesson lesson = newLessonRequest.toEntity();
-        lesson.setCourse(optionalCourse.get());
-        lesson.setAuthor(optionalAuthor.get());
-        lessonRepository.save(lesson);
+        Section section = newSectionRequest.toEntity();
+        section.setCourse(optionalCourse.get());
+        section.setAuthor(optionalAuthor.get());
+        sectionRepository.save(section);
 
-        return ResponseEntity.ok(new LessonResponse(lesson));
+        return ResponseEntity.ok(new NewSectionResponse(section));
     }
 
     private List<String> getErrorMessageValidation(BindingResult bindingResult) {
         return bindingResult.getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
+    }
+
+
+    @PostMapping("/courses/{courseCode}/sections/{sectionCode}")
+    ResponseEntity<?> newVideo(@PathVariable("courseCode") String courseCode, @PathVariable("sectionCode") String sectionCode,
+                  @Valid @RequestBody NewVideoRequest newVideoRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(getErrorMessageValidation(bindingResult));
+        }
+
+        Optional<Course> optionalCourse = courseRepository.findByCode(courseCode);
+        if (optionalCourse.isEmpty()) {
+            return ResponseEntity.badRequest().body("Curso não encontrado");
+        }
+
+        Optional<Section> optionalSection = sectionRepository.findByCode(sectionCode);
+        if (optionalSection.isEmpty()) {
+            return ResponseEntity.badRequest().body("Aula não encontrada");
+        }
+
+        Section section = optionalSection.get();
+        if (section.videoExists(newVideoRequest.getVideo())) {
+            return ResponseEntity.badRequest().body("Vídeo repetido");
+        }
+
+        Video video = newVideoRequest.toEntity();
+        video.setSection(section);
+        videoRepository.save(video);
+        section.addVideo(video);
+        sectionRepository.save(section);
+        System.out.println(video);
+        System.out.println(section);
+
+        return ResponseEntity.ok(new NewVideoResponse(video));
     }
 }

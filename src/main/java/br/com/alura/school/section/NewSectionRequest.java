@@ -1,4 +1,4 @@
-package br.com.alura.school.lesson;
+package br.com.alura.school.section;
 
 import br.com.alura.school.support.validation.Unique;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class NewLessonRequest {
-    @Unique(entity = Lesson.class, field = "code", message = "Código da aula deve ser único")
+public class NewSectionRequest {
+    @Unique(entity = Section.class, field = "code", message = "Código da aula deve ser único")
     @NotBlank(message = "Código não pode estar em branco")
     @JsonProperty
     private final String code;
@@ -21,7 +21,7 @@ public class NewLessonRequest {
     @JsonProperty
     private final String authorUsername;
 
-    public NewLessonRequest(String code, String title, String authorUsername) {
+    public NewSectionRequest(String code, String title, String authorUsername) {
         this.code = code;
         this.title = title;
         this.authorUsername = authorUsername;
@@ -40,7 +40,7 @@ public class NewLessonRequest {
                 '}';
     }
 
-    public Lesson toEntity() {
-        return new Lesson(code, title);
+    public Section toEntity() {
+        return new Section(code, title);
     }
 }

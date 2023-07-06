@@ -64,38 +64,6 @@ class CourseController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/courses/{code}/sections")
-    ResponseEntity<?> newLesson(@PathVariable("code") String code,
-                                @RequestBody @Valid NewSectionRequest newSectionRequest,
-                                BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(getErrorMessageValidation(bindingResult));
-        }
-
-        Optional<Course> optionalCourse = courseRepository.findByCode(code);
-
-        if (optionalCourse.isEmpty()) {
-            return ResponseEntity.badRequest().body("Curso não encontrado");
-        }
-
-        Optional<User> optionalAuthor = userRepository.findByUsername(newSectionRequest.getAuthorUsername());
-
-        if (optionalAuthor.isEmpty()) {
-            return ResponseEntity.badRequest().body("Autor não encontrado");
-        }
-
-        if (optionalAuthor.get().isntInstructor()) {
-            return ResponseEntity.badRequest().body("Autor não é instrutor");
-        }
-
-        Section section = newSectionRequest.toEntity();
-        section.setCourse(optionalCourse.get());
-        section.setAuthor(optionalAuthor.get());
-        sectionRepository.save(section);
-
-        return ResponseEntity.ok(new NewSectionResponse(section));
-    }
-
     private List<String> getErrorMessageValidation(BindingResult bindingResult) {
         return bindingResult.getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)

@@ -46,9 +46,9 @@ Foram criados:
 - A migration para a tabela `Section`. A modelagem é que várias `Section` estão associadas a um `Course`.
   uma `Section` contém um autor(`User`).
 - A entidade `Section` mapeada, atributos `User author` e `Course course` com a anotação `@ManyToOne`
-- A classe `NewSectionRequest` que é o `DTO` para a requisição para criar novos cursos.
+- A classe `NewSectionRequest` que é o `DTO` para a requisição para criar novas aulas.
 - A interface `SectionRepository` com o método `Optional<Section> findByCode(String code);`
-- A classe `NewSectionResponse`, `DTO` para responder após à criação do curso.
+- A classe `NewSectionResponse`, `DTO` para responder após à criação do aula.
 - a classe `SectionController` para cadastrar `Section`. 
 
 **obs:** Iniciamente criei as classes com o prefixo `Lesson` ou inclusão da mesma, após dúvidas sobre a section, o meu
@@ -64,15 +64,46 @@ Foram criados:
   Um `Video` não pode se repetir na `Section`, como consequência, inferi que o vídeo não deve se repetir em outros
   cursos, logo o atributo `url` link do vídeo com a restrição `unique`.
 - A entidade `Video` mapeada, atributos `Section section` com a anotação `@ManyToOne`
-- A classe `NewVideoRequest` que é o `DTO` para a requisição para criar novos videos.
+- A classe `NewVideoRequest` que é o `DTO` para a requisição para conter os dados dos novos videos.
 - A interface `VideoRepository`.
 - A classe `NewVideoResponse`, `DTO` para responder após à criação do video.
+- A classe `VideoController` para cadastrar video novo.
+
+Classe alterada:
+
+- A classe `Section` foi alterada para ter uma lista de `Video` com a anotação `@OneToMany`
+
+## 3º desafio do projeto: Implementar a matrícula de usuário
+
+Foram criados:
+
+- A migration para a tabela `Enrollment`. Um curso pode ter vários alunos matriculados, porém uma matrícula não pode se 
+repetir no mesmo curso. Logo foi colocada a restrição de `unique` User e Course.
+- A entidade `Enrollment` mapeada, atributos `Course course` e `User` com a anotação `@ManyToOne`
+- A classe `NewEnrollmentRequest` que é o `DTO` para a requisição para conter os dados das novas matriculas.
+- A interface `EnrollmentRepository` com o método 
+  `Optional<Enrollment> findByUser_UsernameAndCourse_Code(String username, String courseCode);`. Esse método serve para
+  pesquisar o usuário e o curso que o mesmo está cadastrado, serve para validar e não cadastrar usuário repetido.
+- A classe `NewEnrollmentResponse`, `DTO` para responder após à criação da matrícula.
+- A classe `EnrollmentController` para cadastrar nova matrícula.
 
 
+## 4º desafio do projeto: Implementar relatório de vídeos por aula
 
+Foram criados:
 
-
-
-
-
-
+- A interface `ReportRepository` com o método
+  `List<ReportProjection> findSectionByVideosReport();`. 
+  com a query natina:
+```sql
+SELECT  c.name AS courseName, s.title AS sectionTitle, u.username AS authorName, COUNT(v.id) AS totalVideos 
+            FROM Course c 
+            INNER JOIN Section s ON c.id = s.course_id  
+            INNER JOIN User u ON s.author_id = u.id 
+            LEFT JOIN Video v ON s.id = v.section_id 
+            INNER JOIN Enrollment e ON c.id = e.course_id 
+            GROUP BY c.name, s.title, u.username;
+```
+- A interface `ReportProjection`,projeção para recuperar somente os atributos resultante da query.
+- A classe `ReportController` para receber a requisição do relatório retornar o relatório.
+- A classe `ReportResponse` que é o `DTO`.

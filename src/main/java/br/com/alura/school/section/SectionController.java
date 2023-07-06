@@ -57,6 +57,6 @@ public class SectionController {
         section.setAuthor(optionalAuthor.get());
         sectionRepository.save(section);
 
-        return ResponseEntity.ok(new NewSectionResponse(section));
+        return ResponseEntity.created(null).body(new NewSectionResponse(section));
     }
 }

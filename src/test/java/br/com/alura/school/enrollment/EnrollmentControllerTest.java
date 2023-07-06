@@ -35,14 +35,6 @@ public class EnrollmentControllerTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private EnrollmentRepository enrollmentRepository;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    // ...
-
     @AfterAll
     public static void limparBaseDeDados(@Autowired WebApplicationContext webApplicationContext) {
         CourseRepository courseRepository = webApplicationContext.getBean(CourseRepository.class);

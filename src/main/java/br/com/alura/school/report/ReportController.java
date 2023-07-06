@@ -20,7 +20,6 @@ public class ReportController {
         List<ReportProjection> reportData = reportRepository.findSectionByVideosReport();
 
         if(reportData.isEmpty()) {
-            System.out.println("Sem cursos com matrículas");
             return ResponseEntity.noContent().build();
         }
 
@@ -31,8 +30,6 @@ public class ReportController {
                                 reportProjection.getAuthorName(),
                                 reportProjection.getTotalVideos()))
                 .collect(Collectors.toList());
-        System.out.println("Report");
-        sectionByVideos.forEach(System.out::println);
 
         return ResponseEntity.ok().body(sectionByVideos);
     }

@@ -5,12 +5,14 @@ import br.com.alura.school.course.CourseRepository;
 import br.com.alura.school.user.User;
 import br.com.alura.school.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EnrollmentTest {
+public class EnrollmentControllerTest {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -36,6 +38,21 @@ public class EnrollmentTest {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
 
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    // ...
+
+    @AfterAll
+    public static void limparBaseDeDados(@Autowired WebApplicationContext webApplicationContext) {
+        CourseRepository courseRepository = webApplicationContext.getBean(CourseRepository.class);
+        UserRepository userRepository = webApplicationContext.getBean(UserRepository.class);
+        EnrollmentRepository enrollmentRepository = webApplicationContext.getBean(EnrollmentRepository.class);
+
+        enrollmentRepository.deleteAll();
+        courseRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @Test
     void should_add_new_enrollment() throws Exception {

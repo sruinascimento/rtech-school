@@ -87,6 +87,12 @@ repetir no mesmo curso. Logo foi colocada a restrição de `unique` User e Cours
 - A classe `NewEnrollmentResponse`, `DTO` para responder após à criação da matrícula.
 - A classe `EnrollmentController` para cadastrar nova matrícula.
 
+### Testes de unidade: `EnrollmentTest`
+- Test para adicionar matrícula
+- Test para invalidar `userName` em branco
+- Test para inavalidar matricula repetida
+- Test para invalidar requisição ruim com curso inválido
+
 
 ## 4º desafio do projeto: Implementar relatório de vídeos por aula
 
@@ -96,13 +102,13 @@ Foram criados:
   `List<ReportProjection> findSectionByVideosReport();`. 
   com a query natina:
 ```sql
-SELECT  c.name AS courseName, s.title AS sectionTitle, u.username AS authorName, COUNT(v.id) AS totalVideos 
-            FROM Course c 
-            INNER JOIN Section s ON c.id = s.course_id  
-            INNER JOIN User u ON s.author_id = u.id 
-            LEFT JOIN Video v ON s.id = v.section_id 
-            INNER JOIN Enrollment e ON c.id = e.course_id 
-            GROUP BY c.name, s.title, u.username;
+SELECT c.name AS courseName, s.title AS sectionTitle, u.username AS authorName, COUNT(v.id) AS totalVideos
+FROM Course c
+INNER JOIN Section s ON c.id = s.course_id
+INNER JOIN User u ON s.author_id = u.id
+LEFT JOIN Video v ON s.id = v.section_id
+INNER JOIN Enrollment e ON c.id = e.course_id
+GROUP BY c.name, s.title, u.username;
 ```
 - A interface `ReportProjection`,projeção para recuperar somente os atributos resultante da query.
 - A classe `ReportController` para receber a requisição do relatório retornar o relatório.

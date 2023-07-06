@@ -49,6 +49,7 @@ Foram criados:
 - A classe `NewSectionRequest` que é o `DTO` para a requisição para criar novos cursos.
 - A interface `SectionRepository` com o método `Optional<Section> findByCode(String code);`
 - A classe `NewSectionResponse`, `DTO` para responder após à criação do curso.
+- a classe `SectionController` para cadastrar `Section`. 
 
 **obs:** Iniciamente criei as classes com o prefixo `Lesson` ou inclusão da mesma, após dúvidas sobre a section, o meu
 mentor @aquiles, esclareceu essa idea de section que é aula. Tive que refatorar, e ao fazer esta refatoração, tive que fazer uso dos
@@ -67,7 +68,6 @@ Foram criados:
 - A interface `VideoRepository`.
 - A classe `NewVideoResponse`, `DTO` para responder após à criação do video.
 
-O controller utilizado para 
 
 
 

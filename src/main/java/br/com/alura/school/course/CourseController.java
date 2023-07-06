@@ -70,37 +70,4 @@ class CourseController {
                 .collect(Collectors.toList());
     }
 
-
-    @PostMapping("/courses/{courseCode}/sections/{sectionCode}")
-    ResponseEntity<?> newVideo(@PathVariable("courseCode") String courseCode, @PathVariable("sectionCode") String sectionCode,
-                  @Valid @RequestBody NewVideoRequest newVideoRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(getErrorMessageValidation(bindingResult));
-        }
-
-        Optional<Course> optionalCourse = courseRepository.findByCode(courseCode);
-        if (optionalCourse.isEmpty()) {
-            return ResponseEntity.badRequest().body("Curso não encontrado");
-        }
-
-        Optional<Section> optionalSection = sectionRepository.findByCode(sectionCode);
-        if (optionalSection.isEmpty()) {
-            return ResponseEntity.badRequest().body("Aula não encontrada");
-        }
-
-        Section section = optionalSection.get();
-        if (section.videoExists(newVideoRequest.getVideo())) {
-            return ResponseEntity.badRequest().body("Vídeo repetido");
-        }
-
-        Video video = newVideoRequest.toEntity();
-        video.setSection(section);
-        videoRepository.save(video);
-        section.addVideo(video);
-        sectionRepository.save(section);
-        System.out.println(video);
-        System.out.println(section);
-
-        return ResponseEntity.ok(new NewVideoResponse(video));
-    }
 }

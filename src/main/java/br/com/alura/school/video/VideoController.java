@@ -55,8 +55,6 @@ public class VideoController {
         videoRepository.save(video);
         section.addVideo(video);
         sectionRepository.save(section);
-        System.out.println(video);
-        System.out.println(section);
 
         return ResponseEntity.ok(new NewVideoResponse(video));
     }

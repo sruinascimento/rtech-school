@@ -113,3 +113,5 @@ GROUP BY c.name, s.title, u.username;
 - A interface `ReportProjection`,projeção para recuperar somente os atributos resultante da query.
 - A classe `ReportController` para receber a requisição do relatório retornar o relatório.
 - A classe `ReportResponse` que é o `DTO`.
+
+## 5º Desafio do projeto: Implementar endpoint `/courses/{code}` para retonar aulas e video

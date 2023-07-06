@@ -7,6 +7,7 @@ import br.com.alura.school.video.Video;
 import javax.persistence.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -76,6 +77,10 @@ public class Section {
         return videos.stream()
                 .map(Video::getUrl)
                 .anyMatch(videoUrl -> videoUrl.equals(url));
+    }
+
+    public List<Video> getVideos() {
+        return Collections.unmodifiableList(videos);
     }
 
     public void addVideo(Video video) {

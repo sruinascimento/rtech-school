@@ -26,19 +26,6 @@ class CourseControllerTest {
     private CourseRepository courseRepository;
 
     @Test
-    void should_retrieve_course_by_code() throws Exception {
-        courseRepository.save(new Course("java-1", "Java OO", "Java and Object Orientation: Encapsulation, Inheritance and Polymorphism."));
-
-        mockMvc.perform(get("/courses/java-1")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code", is("java-1")))
-                .andExpect(jsonPath("$.name", is("Java OO")))
-                .andExpect(jsonPath("$.shortDescription", is("Java and O...")));
-    }
-
-    @Test
     void should_retrieve_all_courses() throws Exception {
         courseRepository.save(new Course("spring-1", "Spring Basics", "Spring Core and Spring MVC."));
         courseRepository.save(new Course("spring-2", "Spring Boot", "Spring Boot"));

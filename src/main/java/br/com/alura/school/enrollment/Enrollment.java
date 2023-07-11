@@ -27,6 +27,12 @@ public class Enrollment {
     public Enrollment() {
     }
 
+    public Enrollment(LocalDate enrollmentDate, User user, Course course) {
+        this.enrollmentDate = enrollmentDate;
+        this.user = user;
+        this.course = course;
+    }
+
     public void setEnrollmentDate(LocalDate enrollmentDate) {
         this.enrollmentDate = enrollmentDate;
     }

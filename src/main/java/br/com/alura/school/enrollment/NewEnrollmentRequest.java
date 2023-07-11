@@ -1,5 +1,7 @@
 package br.com.alura.school.enrollment;
 
+import br.com.alura.school.course.Course;
+import br.com.alura.school.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,19 +14,18 @@ public class NewEnrollmentRequest {
     private final String username;
 
     @JsonIgnore
-    private final LocalDate dateEnrollment;
+    private final LocalDate dateEnrollment = LocalDate.now();
 
     public NewEnrollmentRequest(@JsonProperty("username") String username) {
         this.username = username;
-        this.dateEnrollment = LocalDate.now();
     }
 
     public String getUsername() {
         return username;
     }
 
-    public LocalDate getDateEnrollment() {
-        return dateEnrollment;
+    public Enrollment toEntity(User user, Course course) {
+        return new Enrollment(dateEnrollment, user, course);
     }
 
     @Override

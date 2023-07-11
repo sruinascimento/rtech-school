@@ -5,15 +5,16 @@ import br.com.alura.school.course.CourseRepository;
 import br.com.alura.school.user.User;
 import br.com.alura.school.user.UserRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import br.com.alura.school.support.validation.ErrorMessageValidation;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.Optional;
+
+import static java.lang.String.format;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 public class EnrollmentController {
@@ -29,42 +30,25 @@ public class EnrollmentController {
         this.userRepository = userRepository;
     }
 
-
     @PostMapping("/courses/{courseCode}/enroll")
     ResponseEntity<?> addEnrollment(@PathVariable("courseCode") String courseCode,
-                                 @RequestBody @Valid NewEnrollmentRequest newEnrollmentRequest,
-                                 BindingResult bindingResult) {
+                                 @RequestBody @Valid NewEnrollmentRequest newEnrollmentRequest) {
 
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(ErrorMessageValidation.getErrorMessageValidation(bindingResult));
-        }
+        Course course = courseRepository.findByCode(courseCode)
+                .orElseThrow(
+                        () -> new ResponseStatusException(BAD_REQUEST, format("Course with code %s not found", courseCode)));
 
-        Optional<Course> optionalCourse = courseRepository.findByCode(courseCode);
+        User user = userRepository.findByUsername(newEnrollmentRequest.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, format("User with username %s not found", newEnrollmentRequest.getUsername())));
 
-        if (optionalCourse.isEmpty()) {
-            return ResponseEntity.badRequest().body("Curso inválido.");
+        enrollmentRepository.findByUser_UsernameAndCourse_Code(newEnrollmentRequest.getUsername(), courseCode)
+                .ifPresent(existingEnrollment -> {
+                    throw new ResponseStatusException(CONFLICT, format("Student with username %s already enrolled in course %s", newEnrollmentRequest.getUsername(), courseCode));
+                });
 
-        }
+        enrollmentRepository.save(newEnrollmentRequest.toEntity(user, course));
 
-        Optional<User> optionalUser = userRepository.findByUsername(newEnrollmentRequest.getUsername());
-        if(optionalUser.isEmpty()) {
-            return ResponseEntity.badRequest().body("Usuário inválido.");
-
-        }
-
-        Optional<Enrollment> optionalEnrollment = enrollmentRepository.findByUser_UsernameAndCourse_Code(newEnrollmentRequest.getUsername(), courseCode);
-        if (optionalEnrollment.isPresent()) {
-            return ResponseEntity.badRequest().body("Aluno já matriculado no curso.");
-        }
-
-        Enrollment enrollment = new Enrollment();
-        enrollment.setUser(optionalUser.get());
-        enrollment.setEnrollmentDate(newEnrollmentRequest.getDateEnrollment());
-        enrollment.setCourse(optionalCourse.get());
-
-        enrollmentRepository.save(enrollment);
-
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.status(CREATED).build();
 
     }
 }

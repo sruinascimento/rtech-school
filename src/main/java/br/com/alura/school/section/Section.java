@@ -45,6 +45,13 @@ public class Section {
         this.title = title;
     }
 
+    public Section(String code, String title, User author, Course course) {
+        this.code = code;
+        this.title = title;
+        this.author = author;
+        this.course = course;
+    }
+
     public void setCourse(Course course) {
         this.course = course;
     }
@@ -71,12 +78,6 @@ public class Section {
 
     public Course getCourse() {
         return course;
-    }
-
-    public boolean videoExists(String url) {
-        return videos.stream()
-                .map(Video::getUrl)
-                .anyMatch(videoUrl -> videoUrl.equals(url));
     }
 
     public List<Video> getVideos() {

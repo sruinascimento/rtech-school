@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.Optional;
 
 import static br.com.alura.school.support.validation.ErrorMessageValidation.getErrorMessageValidation;
+import static java.lang.String.format;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 public class VideoController {
@@ -30,25 +33,18 @@ public class VideoController {
 
     @PostMapping("/courses/{courseCode}/sections/{sectionCode}")
     ResponseEntity<?> newVideo(@PathVariable("courseCode") String courseCode, @PathVariable("sectionCode") String sectionCode,
-                               @Valid @RequestBody NewVideoRequest newVideoRequest, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(getErrorMessageValidation(bindingResult));
-        }
+                               @Valid @RequestBody NewVideoRequest newVideoRequest) {
 
-        Optional<Course> optionalCourse = courseRepository.findByCode(courseCode);
-        if (optionalCourse.isEmpty()) {
-            return ResponseEntity.badRequest().body("Curso não encontrado");
-        }
+        courseRepository.findByCode(courseCode)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format("Course with code %s not found", courseCode)));
 
-        Optional<Section> optionalSection = sectionRepository.findByCode(sectionCode);
-        if (optionalSection.isEmpty()) {
-            return ResponseEntity.badRequest().body("Aula não encontrada");
-        }
+        Section section = sectionRepository.findByCode(sectionCode)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format("Section with code %s not found", sectionCode)));
 
-        Section section = optionalSection.get();
-        if (section.videoExists(newVideoRequest.getVideo())) {
-            return ResponseEntity.badRequest().body("Vídeo repetido");
-        }
+        videoRepository.findByUrl(newVideoRequest.getVideo())
+                .ifPresent(existingVideo -> {
+                    throw new ResponseStatusException(CONFLICT, format("Video %s already registred", newVideoRequest.getVideo()));
+                });
 
         Video video = newVideoRequest.toEntity();
         video.setSection(section);

@@ -1,6 +1,8 @@
 package br.com.alura.school.section;
 
+import br.com.alura.school.course.Course;
 import br.com.alura.school.support.validation.Unique;
+import br.com.alura.school.user.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
@@ -40,7 +42,7 @@ public class NewSectionRequest {
                 '}';
     }
 
-    public Section toEntity() {
-        return new Section(code, title);
+    public Section toEntity(Course course, User author) {
+        return new Section(code, title, author, course);
     }
 }

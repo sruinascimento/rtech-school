@@ -5,16 +5,16 @@ import br.com.alura.school.course.CourseRepository;
 import br.com.alura.school.user.User;
 import br.com.alura.school.user.UserRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
-import static br.com.alura.school.support.validation.ErrorMessageValidation.getErrorMessageValidation;
+import static java.lang.String.format;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 public class SectionController {
@@ -30,33 +30,22 @@ public class SectionController {
 
     @PostMapping("/courses/{code}/sections")
     ResponseEntity<?> newLesson(@PathVariable("code") String code,
-                                @RequestBody @Valid NewSectionRequest newSectionRequest,
-                                BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(getErrorMessageValidation(bindingResult));
-        }
+                                @RequestBody @Valid NewSectionRequest newSectionRequest) {
 
-        Optional<Course> optionalCourse = courseRepository.findByCode(code);
+        Course course = courseRepository.findByCode(code)
+                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, format("Course with code %s not found", code)));
 
-        if (optionalCourse.isEmpty()) {
-            return ResponseEntity.badRequest().body("Curso não encontrado");
-        }
+        User user = userRepository.findByUsername(newSectionRequest.getAuthorUsername())
+                .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, format("User with username %s not found", newSectionRequest.getAuthorUsername())));
 
-        Optional<User> optionalAuthor = userRepository.findByUsername(newSectionRequest.getAuthorUsername());
-
-        if (optionalAuthor.isEmpty()) {
-            return ResponseEntity.badRequest().body("Autor não encontrado");
-        }
-
-        if (optionalAuthor.get().isntInstructor()) {
+        if (user.isntInstructor()) {
             return ResponseEntity.badRequest().body("Autor não é instrutor");
         }
 
-        Section section = newSectionRequest.toEntity();
-        section.setCourse(optionalCourse.get());
-        section.setAuthor(optionalAuthor.get());
+        Section section = newSectionRequest.toEntity(course, user);
+
         sectionRepository.save(section);
 
-        return ResponseEntity.created(null).body(new NewSectionResponse(section));
+        return ResponseEntity.status(CREATED).body(new NewSectionResponse(section));
     }
 }

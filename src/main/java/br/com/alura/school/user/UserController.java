@@ -12,7 +12,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 class UserController {
-
     private final UserRepository userRepository;
 
     UserController(UserRepository userRepository) {

@@ -1,7 +1,6 @@
 package br.com.alura.school.user;
 
-public enum PermissaoUsuario {
-
+public enum UserPermission {
     ALUNO,
     INSTRUTOR;
 }

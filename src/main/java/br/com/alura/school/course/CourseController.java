@@ -37,11 +37,7 @@ class CourseController {
         Course course = courseRepository.findByCode(code).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format("Course with code %s not found", code)));
         List<Section> sections = sectionRepository.findByCourse_Code(course.getCode());
         List<CourseReportResponse> coursesResponse = sections.stream()
-                .map(section ->
-                        new CourseReportResponse(section.getCourse().getName(),
-                                section.getTitle(),
-                                section.getAuthor().getUsername(),
-                                section.getVideos()))
+                .map(CourseReportResponse::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(coursesResponse);
     }

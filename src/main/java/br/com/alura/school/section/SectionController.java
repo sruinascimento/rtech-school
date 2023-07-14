@@ -29,7 +29,7 @@ public class SectionController {
     }
 
     @PostMapping("/courses/{code}/sections")
-    ResponseEntity<?> newLesson(@PathVariable("code") String code,
+    ResponseEntity<?> newSection(@PathVariable("code") String code,
                                 @RequestBody @Valid NewSectionRequest newSectionRequest) {
 
         Course course = courseRepository.findByCode(code)
@@ -39,7 +39,7 @@ public class SectionController {
                 .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, format("User with username %s not found", newSectionRequest.getAuthorUsername())));
 
         if (user.isntInstructor()) {
-            return ResponseEntity.badRequest().body("Autor não é instrutor");
+            return ResponseEntity.badRequest().body(format("Author %s isnt Instructor", user.getUsername()));
         }
 
         Section section = newSectionRequest.toEntity(course, user);

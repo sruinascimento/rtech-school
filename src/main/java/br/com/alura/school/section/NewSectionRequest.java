@@ -9,17 +9,17 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 public class NewSectionRequest {
-    @Unique(entity = Section.class, field = "code", message = "Código da aula deve ser único")
-    @NotBlank(message = "Código não pode estar em branco")
+    @Unique(entity = Section.class, field = "code", message = "Section code must be unique")
+    @NotBlank(message = "Section code cant be blank")
     @JsonProperty
     private final String code;
 
-    @Size(min=5, message = "Título deve ter no mínimo 5 caracteres")
-    @NotBlank(message = "Título não pode estar em branco")
+    @Size(min=5, message = "Title size must be min five letter")
+    @NotBlank(message = "Title cant be blank")
     @JsonProperty
     private final String title;
 
-    @NotBlank(message = "Username do autor não pode estar em branco")
+    @NotBlank(message = "Author username cant be blank")
     @JsonProperty
     private final String authorUsername;
 

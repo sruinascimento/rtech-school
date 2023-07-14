@@ -1,11 +1,9 @@
 package br.com.alura.school.video;
 
-import br.com.alura.school.course.Course;
 import br.com.alura.school.course.CourseRepository;
 import br.com.alura.school.section.Section;
 import br.com.alura.school.section.SectionRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,9 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
-import static br.com.alura.school.support.validation.ErrorMessageValidation.getErrorMessageValidation;
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.*;
 
@@ -46,12 +42,11 @@ public class VideoController {
                     throw new ResponseStatusException(CONFLICT, format("Video %s already registred", newVideoRequest.getVideo()));
                 });
 
-        Video video = newVideoRequest.toEntity();
-        video.setSection(section);
+        Video video = newVideoRequest.toEntity(section);
+//        video.setSection(section);
         videoRepository.save(video);
-        section.addVideo(video);
-        sectionRepository.save(section);
-
+//        section.addVideo(video);
+//        sectionRepository.save(section);
         return ResponseEntity.ok(new NewVideoResponse(video));
     }
 }

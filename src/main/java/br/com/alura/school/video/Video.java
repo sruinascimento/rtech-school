@@ -10,14 +10,16 @@ public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String url;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id", nullable = false)
     private Section section;
-
     public Video() {
+    }
+
+    public Video(String url, Section section) {
+        this.url = url;
+        this.section = section;
     }
 
     public Video(String url) {

@@ -9,7 +9,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Table
 public class Course {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

@@ -1,7 +1,7 @@
 package br.com.alura.school.course;
 
+import br.com.alura.school.section.Section;
 import br.com.alura.school.video.NewVideoResponse;
-import br.com.alura.school.video.Video;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -20,11 +20,11 @@ public class CourseReportResponse {
     @JsonProperty
     private final List<NewVideoResponse> videos;
 
-    public CourseReportResponse(String courseName, String sectionTile, String sectionAuthor, List<Video> videos) {
-        this.courseName = courseName;
-        this.sectionTile = sectionTile;
-        this.sectionAuthor = sectionAuthor;
-        this.videos = videos.stream()
+    public CourseReportResponse(Section section) {
+        this.courseName = section.getCourse().getName();
+        this.sectionTile = section.getTitle();
+        this.sectionAuthor = section.getAuthor().getUsername();
+        this.videos = section.getVideos().stream()
                 .map(NewVideoResponse::new)
                 .collect(Collectors.toList());
     }

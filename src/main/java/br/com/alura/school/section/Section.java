@@ -30,7 +30,7 @@ public class Section {
     private Course course;
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
     private List<Video> videos = new ArrayList<>();
-
+    @Deprecated
     public Section() {
     }
 

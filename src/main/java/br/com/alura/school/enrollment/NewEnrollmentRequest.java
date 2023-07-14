@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 public class NewEnrollmentRequest {
-    @NotBlank(message = "o Campo nome não pode estar vazio")
+    @NotBlank(message = "The username cant be blank")
     @JsonProperty
     private final String username;
 
